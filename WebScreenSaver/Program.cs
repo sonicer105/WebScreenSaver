@@ -2,7 +2,6 @@ namespace WebScreenSaver
 {
     internal static class Program
     {
-        private const string ConfigFilePath = "screensaver_config.txt";
         
         [STAThread]
         static void Main(string[] args)
@@ -10,16 +9,17 @@ namespace WebScreenSaver
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            string savedUrl = LoadUrl();
+            string configFilePath = GetConfigFilePath();
+            string savedUrl = LoadUrl(configFilePath);
 
-            if (args.Length == 0 || args[0].ToLower() == "/c")
+            if (args.Length == 0 || args[0].ToLower().StartsWith("/c"))
             {
                 // Default to configuration mode if no arguments are provided
                 using (var configForm = new ConfigForm(savedUrl))
                 {
                     if (configForm.ShowDialog() == DialogResult.OK)
                     {
-                        SaveUrl(configForm.ConfiguredUrl);
+                        SaveUrl(configForm.ConfiguredUrl, configFilePath);
                     }
                 }
             }
@@ -39,7 +39,14 @@ namespace WebScreenSaver
             }
         }
 
-        private static string LoadUrl()
+        private static string GetConfigFilePath()
+        {
+            // Get the directory of the .scr file
+            string scrDirectory = Path.GetDirectoryName(Application.ExecutablePath);
+            return Path.Combine(scrDirectory, "screensaver_config.txt");
+        }
+
+        private static string LoadUrl(string ConfigFilePath)
         {
             if (File.Exists(ConfigFilePath))
             {
@@ -50,7 +57,7 @@ namespace WebScreenSaver
             return "https://google.com";
         }
 
-        private static void SaveUrl(string url)
+        private static void SaveUrl(string url, string ConfigFilePath)
         {
             File.WriteAllText(ConfigFilePath, url);
         }
