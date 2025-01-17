@@ -7,38 +7,34 @@ namespace WebScreenSaver
         [STAThread]
         static void Main(string[] args)
         {
-            ApplicationConfiguration.Initialize();
+            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             string savedUrl = LoadUrl();
 
-            if (args.Length > 0)
+            if (args.Length == 0 || args[0].ToLower() == "/c")
             {
-                switch (args[0].ToLower())
+                // Default to configuration mode if no arguments are provided
+                using (var configForm = new ConfigForm(savedUrl))
                 {
-                    case "/s": // Screensaver mode
-                        Application.Run(new Form1(savedUrl)); // Replace Form1 with your main form
-                        break;
-                    case "/c": // Configuration mode
-                        using (var configForm = new ConfigForm(savedUrl))
-                        {
-                            if (configForm.ShowDialog() == DialogResult.OK)
-                            {
-                                SaveUrl(configForm.ConfiguredUrl);
-                            }
-                        }
-                        break;
-                    case "/p": // Preview mode
-                        Application.Exit();
-                        break;
-                    default:
-                        Application.Exit();
-                        break;
+                    if (configForm.ShowDialog() == DialogResult.OK)
+                    {
+                        SaveUrl(configForm.ConfiguredUrl);
+                    }
                 }
+            }
+            else if (args[0].ToLower() == "/s")
+            {
+                // Screensaver mode
+                Application.Run(new Form1(savedUrl));
+            }
+            else if (args[0].ToLower().StartsWith("/p"))
+            {
+                // Preview mode (not fully implemented)
             }
             else
             {
-                // Default behavior (optional)
+                // Fallback for unknown arguments
                 Application.Run(new Form1(savedUrl));
             }
         }
