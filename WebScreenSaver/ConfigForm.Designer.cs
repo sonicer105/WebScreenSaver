@@ -82,8 +82,9 @@
             Controls.Add(label1);
             Controls.Add(urlTextBox);
             Controls.Add(saveButton);
+            MinimumSize = new Size(400, 200);
             Name = "ConfigForm";
-            Text = "ConfigForm";
+            Text = "Web Screen Saver Config";
             ResumeLayout(false);
             PerformLayout();
         }
